@@ -1,0 +1,28 @@
+{
+  "name": "bidmc-its-files",
+  "version": "1.0.0",
+  "description": "watch files for analytics and possibly for DR replication",
+  "main": "main.js",
+  "author": "Robert Hurst",
+  "publisher": "rhurst",
+  "license": "MIT",
+  "os": [
+    "linux"
+  ],
+  "engines": {
+    "node": ">=10.10"
+  },
+  "scripts": {
+    "build": "./build.sh",
+    "debug": "./build.sh && ./debug.sh",
+    "test": "./test.sh"
+  },
+  "dependencies": {
+    "chokidar": "^3.3.0",
+    "modern-syslog": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.6",
+    "@types/typescript": "^2.0.0"
+  }
+}

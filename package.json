@@ -5,6 +5,13 @@
   "main": "main.js",
   "author": "Robert Hurst",
   "publisher": "rhurst",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theflyingape/bidmc-its-files"
+  },
+  "bugs": {
+    "url": "https://github.com/theflyingape/bidmc-its-files/issues"
+  },
   "license": "MIT",
   "os": [
     "linux"
@@ -19,9 +26,11 @@
   },
   "dependencies": {
     "chokidar": "^3.3.0",
+    "express": "^4.17.1",
     "modern-syslog": "^1.2.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.1",
     "@types/node": "^12.12.6",
     "@types/typescript": "^2.0.0"
   }

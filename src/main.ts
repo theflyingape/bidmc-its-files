@@ -4,13 +4,13 @@
 \*****************************************************************************/
 import chokidar = require('chokidar')
 import dns = require('dns')
-//import express = require('express')
+import express = require('express')
 import fs = require('fs')
 import https = require('https')
 import os = require('os')
 import path = require('path')
 //import pty = require('node-pty')
-//import serverStatic = require('serve-static')
+import serverStatic = require('serve-static')
 import syslog = require('modern-syslog')
 //import ws = require('ws')
 const { URL } = require('url')
@@ -36,17 +36,17 @@ process.on('SIGHUP', function () {
     console.log(new Date() + ' :: received hangup')
     syslog.warn('hangup')
 })
-  
+
 process.on('SIGINT', function () {
     console.log(new Date() + ' :: received interrupt')
     syslog.warn('interrupt')
 })
-  
+
 process.on('SIGQUIT', function () {
     console.log(new Date() + ' :: received quit')
     syslog.warn('quit')
 })
-  
+
 process.on('SIGTERM', function () {
     console.log(new Date() + ' shutdown - ', events, 'trapped')
     syslog.note('Terminating this service profile')

@@ -14,7 +14,7 @@ import path = require('path')
 import serverStatic = require('serve-static')
 import syslog = require('modern-syslog')
 //import ws = require('ws')
-import { ChildProcess, spawn } from 'child_process'
+import { spawn } from 'child_process'
 const { URL } = require('url')
 
 process.title = 'watcher'
@@ -25,16 +25,15 @@ if (isNaN(+loglevel)) loglevel = syslog.level[loglevel]
 
 syslog.open(process.title)
 syslog.upto(+loglevel)
-syslog.note(`started using ${gs.version().product}`)
 
 let events = 0
 
 const watcher = chokidar.watch('.', {
+    ignored: [ '**/.**', '**/node_modules/**', '**/tmp/**' ],
     ignoreInitial: true
 })
 
-syslog.note(`watching for PCL files`)
-console.log(watcher.getWatched())
+syslog.note(`started up in ${__dirname}`)
 
 watcher.on('add', (file) => {
     console.log(event, file)
@@ -43,14 +42,14 @@ watcher.on('add', (file) => {
     if (/.*\.pcl$/i.test(file)) {
         let pdf = path.join(path.dirname(file), path.basename(file, path.extname(file)) + '.pdf')
 
-        const child: ChildProcess = spawn('./gpcl6',
+        spawn('./gpcl6',
             ['-dNOPAUSE', `-sOutputFile=${pdf}`, '-sDEVICE=pdfwrite', `${file}`])
             .on('exit', (code, signal) => {
                 syslog.note(`${pdf} exit code ${code} ${signal && 'signal ' + signal || ''}`)
             })
 
 /*
-        gs.execute(`-dNOPAUSE -sOutputFile=${pdf} -sDEVICE=pdfwrite ${path}`)
+        gs.execute(`-dNOPAUSE -sOutputFile=${pdf} -sDEVICE=pdfwrite ${file}`)
             .then(() => {
                 console.log(`converted to ${pdf}`)
             })
@@ -62,7 +61,8 @@ watcher.on('add', (file) => {
     })
 
 watcher.on('ready', () => {
-    console.log('Initial scan complete. Ready for changes')
+    console.log(`Initial scan complete -- ${Object.keys(watcher.getWatched()).length} dir(s)`)
+    console.log(`Watching for any change`)
 })
 
 process.on('SIGHUP', function () {
@@ -76,13 +76,13 @@ process.on('SIGINT', function () {
 })
 
 process.on('SIGQUIT', function () {
-    console.log(new Date() + ' shutdown - ', events, 'trapped')
-    syslog.warn('quit')
+    console.log(new Date() + ' shutdown:', events, 'trapped')
+    syslog.note('quit')
     process.exit()
 })
 
 process.on('SIGTERM', function () {
-    console.log(new Date() + ' shutdown - ', events, 'trapped')
+    console.log(new Date() + ' shutdown:', events, 'trapped')
     syslog.note('Terminating this service profile')
     process.exit()
 })

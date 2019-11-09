@@ -27,21 +27,16 @@ if (isNaN(+loglevel)) loglevel = syslog.level[loglevel]
 syslog.open(process.title)
 syslog.upto(+loglevel)
 
-let db = new MongoClient('mongodb://dbadmin:test@localhost:27017/chokidar'
-    , { poolSize: 5, reconnectInterval: 500 }).connect((err, db) => {
-        if (err) {
-            console.log("Connection Failed Via Client Object.")
-        } else {
-            console.log("Connected Via Client Object . . .")
-            db.logout((err, result) => {
-                if (!err) {
-                    console.log("Logged out Via Client Object . . .")
-                }
-                db.close()
-                console.log("Connection closed . . .")
-            })
-        }
-    })
+let db = new MongoClient('mongodb://localhost'
+    , { poolSize: 5, reconnectInterval: 500, useUnifiedTopology: true })
+
+db.connect((err, db) => {
+    if (err) {
+        console.log("Connection Failed Via Client Object.")
+    } else {
+        console.log("Connected Via Client Object . . .")
+    }
+})
 
 let events = 0
 
@@ -117,6 +112,16 @@ dns.lookup('localhost', (err, addr, family) => {
  * PROCESS SIGNAL HANDLERS
  *
  ********/
+
+process.on('exit', () => {
+    db.logout((err, result) => {
+        if (!err) {
+            console.log("Logged out Via Client Object . . .")
+        }
+        db.close()
+        console.log("Connection closed . . .")
+    })
+})
 
 process.on('SIGHUP', function () {
     console.log(new Date() + ' :: received hangup')

@@ -5,4 +5,5 @@ data/**
 keys/**
 ghostpcl-9.50
 ghostpdl-9.50
+mongod.log
 package-lock.json

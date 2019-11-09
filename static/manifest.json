@@ -1,0 +1,13 @@
+{
+  "name": "BIDMC ITS Files",
+  "short_name": "Files",
+  "lang": "en-US",
+  "start_url": "https://localhost:20172/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "xterm-js.png"
+    }
+  ]
+}

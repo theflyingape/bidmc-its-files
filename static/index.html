@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>BIDMC ITS: Files service</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<link rel="manifest" href="manifest.json">
+<meta charset="UTF-8">
+<meta name="application-name" content="ssh">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ssh">
+<meta name="theme-color" content="#102040"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=1.0, shrink-to-fit=yes, user-scalable=no">
+<style type='text/css'>
+  #a2hs-button.disabled {
+    opacity: 0.35;
+  }
+</style>
+<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono" rel="stylesheet">
+</head>
+<body bgColor="#010208">
+<div id="dashboard">
+  <span style="text-align:center;">
+    <a href="#" id="a2hs-button" title="Add app to homescreen" tabindex=-1><img src="a2hs.svg" style="height:36px; width:36px;"></a>
+  </span>
+</div>
+<div id="terminal"></div>
+<noscript>https://www.google.com/chrome/</noscript>
+<script type="text/javascript">
+  let a = document.querySelector("#a2hs-button");
+  let t;
+
+  if (! /MSIE \d|Trident.*rv:/.test(navigator.userAgent)) {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').then(function(registration) {
+          // Registration was successful
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+          // registration failed :(
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      t = e;
+      // Update UI notify the user they can add to home screen
+      a.classList.add("available");
+      a.addEventListener("click", function(e) {
+        e.preventDefault();
+        t && !a.classList.contains("disabled") && t.prompt().then(function() {
+          t.userChoice.then(function(e) {
+            "accepted" === e.outcome
+              ? (a.classList.add("disabled"),a.setAttribute("title", "App already installed"), t=null)
+              : a.setAttribute("title", "Refresh the page and click again to install app");
+            a.classList.add("disabled");
+          })
+        });
+      });
+    });
+  }
+</script>
+</body>
+</html>

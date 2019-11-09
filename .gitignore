@@ -1,6 +1,8 @@
 .vscode/**
 **/node_modules/**
 build/**
+data/**
+keys/**
 ghostpcl-9.50
 ghostpdl-9.50
 package-lock.json

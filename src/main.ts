@@ -14,8 +14,9 @@ import path = require('path')
 import serverStatic = require('serve-static')
 import syslog = require('modern-syslog')
 //import ws = require('ws')
+import { MongoClient } from 'mongodb'
 import { spawn } from 'child_process'
-const { URL } = require('url')
+import { URL } from 'url'
 
 process.title = 'watcher'
 //process.chdir(__dirname)
@@ -25,6 +26,22 @@ if (isNaN(+loglevel)) loglevel = syslog.level[loglevel]
 
 syslog.open(process.title)
 syslog.upto(+loglevel)
+
+let db = new MongoClient('mongodb://dbadmin:test@localhost:27017/chokidar'
+    , { poolSize: 5, reconnectInterval: 500 }).connect((err, db) => {
+        if (err) {
+            console.log("Connection Failed Via Client Object.")
+        } else {
+            console.log("Connected Via Client Object . . .")
+            db.logout((err, result) => {
+                if (!err) {
+                    console.log("Logged out Via Client Object . . .")
+                }
+                db.close()
+                console.log("Connection closed . . .")
+            })
+        }
+    })
 
 let events = 0
 
@@ -64,6 +81,42 @@ watcher.on('ready', () => {
     console.log(`Initial scan complete -- ${Object.keys(watcher.getWatched()).length} dir(s)`)
     console.log(`Watching for any change`)
 })
+
+
+/********
+ *
+ *  APIs
+ *
+ ********/
+//dns.lookup('0.0.0.0', (err, addr, family) => {
+dns.lookup('localhost', (err, addr, family) => {
+
+    const app = express()
+    app.set('trust proxy', ['loopback', addr])
+
+    let ssl = { key: fs.readFileSync('keys/localhost.key'), cert: fs.readFileSync('keys/localhost.crt') }
+    let server = https.createServer(ssl, app)
+    let port = parseInt(process.env.PORT) || 20172
+
+    //  enable REST services
+    server.listen(port, addr)
+
+    //  web services
+    app.use('/', express.static('static'))
+
+    app.get('/api/', (req, res) => {
+        let client = req.header('x-forwarded-for') || req.connection.remoteAddress
+        console.log(`API call from remote host: ${client} (${req.hostname})`)
+
+        res.end()
+    })
+})
+
+/********
+ *
+ * PROCESS SIGNAL HANDLERS
+ *
+ ********/
 
 process.on('SIGHUP', function () {
     console.log(new Date() + ' :: received hangup')
